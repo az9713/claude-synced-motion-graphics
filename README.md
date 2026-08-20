@@ -4,6 +4,10 @@ One 10-second selfie stock report, transformed twice by AI agents — autonomous
 
 Inspiration: [Claude FINALLY Turned Into a Design Genius (Motion Graphics, Websites & More)](https://www.youtube.com/watch?v=gEPfF6BFAB4&t=576s).
 
+[![Development journey — click to read the live page](dev-journey-preview.png)](https://az9713.github.io/claude-synced-motion-graphics/dev-journey-stock-report.html)
+
+*Click the preview to read the full development journey as a live page.*
+
 ## Half 1 — transcript-synced motion graphics
 
 A talking-head clip gets five designed overlay cards (title badge, three stock
