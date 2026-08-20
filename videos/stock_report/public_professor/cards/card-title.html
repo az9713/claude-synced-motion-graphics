@@ -1,0 +1,41 @@
+<div class="card" data-card-id="card-title">
+          <style>
+            .card[data-card-id="card-title"] .root {
+              width: 100%;
+              height: 100%;
+              background: transparent;
+            }
+            .card[data-card-id="card-title"] .badge {
+              position: absolute;
+              top: 72px;
+              left: 50%;
+              transform: translateX(-50%);
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 12px;
+            }
+            .card[data-card-id="card-title"] .kicker {
+              font: 700 22px/1 "Inter", sans-serif;
+              letter-spacing: 5px;
+              color: #e2e8f0;
+              text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+            }
+            .card[data-card-id="card-title"] .title {
+              font: 700 60px/1 "Inter", sans-serif;
+              letter-spacing: 8px;
+              color: #ffffff;
+              background: var(--panel);
+              border: 1px solid var(--panel-border);
+              border-radius: 16px;
+              padding: 22px 46px 22px 54px;
+              white-space: nowrap;
+            }
+          </style>
+          <div class="root">
+            <div class="badge" id="card-title-badge">
+              <div class="kicker">AUG 19 &middot; MARKET UPDATE</div>
+              <div class="title">STOCK REPORT</div>
+            </div>
+          </div>
+        </div>

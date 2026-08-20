@@ -1,0 +1,72 @@
+<div class="card" data-card-id="card-google">
+          <style>
+            .card[data-card-id="card-google"] .root {
+              width: 100%;
+              height: 100%;
+              background: transparent;
+            }
+            .card[data-card-id="card-google"] .panel {
+              position: absolute;
+              inset: 0;
+              background: var(--panel);
+              border: 1px solid var(--panel-border);
+              border-radius: 24px;
+              padding: 0 52px 0 60px;
+              display: flex;
+              align-items: center;
+              overflow: hidden;
+            }
+            .card[data-card-id="card-google"] .bar {
+              position: absolute;
+              left: 0;
+              top: 0;
+              width: 10px;
+              height: 0;
+              background: var(--up);
+            }
+            .card[data-card-id="card-google"] .who {
+              display: flex;
+              flex-direction: column;
+              gap: 16px;
+            }
+            .card[data-card-id="card-google"] .ticker {
+              font: 700 40px/1 "Inter", sans-serif;
+              letter-spacing: 3px;
+              color: #0b1220;
+              background: var(--up);
+              border-radius: 12px;
+              padding: 12px 22px;
+              align-self: flex-start;
+            }
+            .card[data-card-id="card-google"] .name {
+              font: 400 30px/1 "Inter", sans-serif;
+              color: var(--muted);
+            }
+            .card[data-card-id="card-google"] .move {
+              margin-left: auto;
+              display: flex;
+              align-items: center;
+              gap: 20px;
+              color: var(--up);
+            }
+            .card[data-card-id="card-google"] .num,
+            .card[data-card-id="card-google"] .sign,
+            .card[data-card-id="card-google"] .pct {
+              font: 700 128px/1 "Inter", sans-serif;
+              letter-spacing: -2px;
+            }
+          </style>
+          <div class="root">
+            <div class="panel">
+              <div class="bar" id="card-google-bar"></div>
+              <div class="who" id="card-google-who">
+                <div class="ticker">GOOGL</div>
+                <div class="name">Alphabet Inc.</div>
+              </div>
+              <div class="move" id="card-google-move">
+                <svg width="56" height="56" viewBox="0 0 24 24"><polygon points="12,3 22,20 2,20" fill="currentColor" /></svg>
+                <span class="sign">+</span><span class="num" id="card-google-num">0</span><span class="pct">%</span>
+              </div>
+            </div>
+          </div>
+        </div>

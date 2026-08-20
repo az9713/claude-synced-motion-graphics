@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="dark">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dev Journey — Stock Report Motion Graphics</title>
+<style>
+  :root {
+    --bg: #0f172a; --card: #1e293b; --text: #e2e8f0; --text2: #cbd5e1;
+    --muted: #94a3b8; --accent: #fb923c; --accent2: #2dd4bf;
+    --border: #334155; --code-bg: #0b1120;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text2);
+    font: 16px/1.65 "Segoe UI", system-ui, sans-serif;
+  }
+  main { max-width: 880px; margin: 0 auto; padding: 48px 24px 80px; }
+  h1 { color: var(--text); font-size: 30px; line-height: 1.25; margin: 0 0 4px; }
+  h2 { color: var(--accent); font-size: 21px; margin: 44px 0 12px; }
+  h3 { color: var(--accent2); font-size: 17px; margin: 26px 0 8px; }
+  p { margin: 10px 0; }
+  .meta { color: var(--muted); font-size: 14px; margin-bottom: 28px; }
+  .meta code { color: var(--text2); }
+  code {
+    background: var(--code-bg); border: 1px solid var(--border); border-radius: 4px;
+    padding: 1px 6px; font: 13.5px/1.5 Consolas, monospace; color: #a5f3fc;
+  }
+  pre {
+    background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px;
+    padding: 14px 16px; overflow-x: auto; margin: 12px 0;
+  }
+  pre code { background: none; border: none; padding: 0; color: #a5f3fc; }
+  table { border-collapse: collapse; width: 100%; margin: 14px 0; font-size: 14.5px; }
+  th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; vertical-align: top; }
+  th { background: var(--card); color: var(--text); }
+  .qa {
+    background: var(--card); border: 1px solid var(--border); border-left: 4px solid var(--accent2);
+    border-radius: 10px; padding: 18px 22px; margin: 24px 0;
+  }
+  .qa h2 { margin: 0 0 10px; color: var(--accent2); font-size: 18px; }
+  .qa dt { color: var(--text); font-weight: 600; margin-top: 12px; }
+  .qa dd { margin: 4px 0 0 0; }
+  .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 16px 0; }
+  .flow .step {
+    background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+    padding: 8px 14px; font-size: 13.5px; color: var(--text);
+  }
+  .flow .step small { display: block; color: var(--muted); font-size: 12px; }
+  .flow .arrow { color: var(--accent); font-size: 18px; }
+  .warn {
+    background: #2a1a10; border: 1px solid #7c4a1d; border-radius: 8px;
+    padding: 12px 16px; margin: 12px 0;
+  }
+  .warn strong { color: var(--accent); }
+  .rule { color: var(--accent2); font-style: italic; }
+  .frames { display: flex; gap: 12px; flex-wrap: wrap; margin: 14px 0; }
+  .frames figure { margin: 0; flex: 1 1 180px; max-width: 210px; }
+  .frames img { width: 100%; border-radius: 8px; border: 1px solid var(--border); }
+  .frames figcaption { font-size: 12.5px; color: var(--muted); margin-top: 4px; }
+  ol li, ul li { margin: 6px 0; }
+  a { color: var(--accent2); }
+</style>
+</head>
+<body>
+<main>
+
+<h1>Development Journey — "Stock Report" motion-graphics overlay video</h1>
+<p class="meta">
+  <strong>Date:</strong> 2026-08-19 &nbsp;·&nbsp;
+  <strong>Deliverable:</strong> <code>videos\stock_report\output.mp4</code> (1080×1920, 10.0s, 16.6&nbsp;MB, with audio)<br>
+  <strong>Brief (verbatim):</strong> "now generate a new video by adding motion graphics as B-roll to the video, based on the transcript. can you do that ? i think you can use remotion skills if you need it. let me know if any gap ?"<br>
+  <strong>Source:</strong> <code>stock_report.MOV</code> — a 10-second iPhone selfie clip. Spoken content: "Google has gone up 30%, Microsoft down 20%, Tesla up 5%."
+</p>
+
+<div class="qa">
+  <h2>The four questions, answered straight</h2>
+  <dl>
+    <dt>Did you use HyperFrames?</dt>
+    <dd>Yes. There is no Remotion skill in this harness. HyperFrames is the installed equivalent: it renders video from an HTML file. Its <code>/talking-head-recut</code> workflow is built for exactly this job — timed graphic cards over unchanged footage. Remotion and HyperFrames share the same core idea (declarative composition + seekable timeline + headless render); HyperFrames swaps React for plain HTML + GSAP.</dd>
+    <dt>How?</dt>
+    <dd>Five stages: probe the video → transcribe speech to word-level timecodes → plan 5 cards in a storyboard → write the cards as HTML with one GSAP timeline → render headless Chrome frames to MP4. Section 2–4 below walk each stage.</dd>
+    <dt>Did you use the SRT?</dt>
+    <dd>Not the file itself. <code>stock_report.srt</code> (made in the previous turn) has 3 clause-level cues. Card timing needs finer grain: the +30% count-up must fire at the instant the word "30%" is spoken (2.72s), not at the clause start (0.0s). So the pipeline re-transcribed to a word-level <code>transcript.json</code>. The SRT served as a content cross-check only.</dd>
+    <dt>Do you need the SRT?</dt>
+    <dd>For this pipeline: no. HyperFrames consumes word-level JSON. The SRT format matters for a different workflow — the Claude Design method in <code>README.txt</code>, where you paste an SRT into a prompt so graphics hold while you talk. The principle is identical in both: <span class="rule">the transcript is the timeline.</span> SRT is the human-readable coarse view; word JSON is the machine-grade fine view of the same data.</dd>
+  </dl>
+</div>
+
+<h2>1. The brief — what was actually asked</h2>
+<p>The request: add motion graphics as "B-roll" to a talking-head clip, synced to the transcript. One ambiguity was resolved silently: "B-roll" strictly means cutaway footage that replaces the camera view. What the clip and the README workflow actually call for is <em>overlays</em> — graphics on top of footage that plays unchanged. The overlay reading was chosen and the cutaway variant (cards take the screen, face shrinks to a corner window) was flagged as a one-line follow-up option, not built. Absence is a choice, not an oversight.</p>
+<p>Invisible constraints active during the build: ponytail mode (minimal-diff, stdlib-first), ASD-STE100 reply style, and the user's standing rule from the audit: <span class="rule">verify by observing effects, never from a clean exit.</span></p>
+
+<h2>2. Cold start — routing and environment</h2>
+<p>The <code>/hyperframes</code> entry skill routes requests by deliverable. Row 4 of its route table matched: "Add designed graphic overlays to existing talking-head footage without changing the footage" → <code>/talking-head-recut</code>. The workflow and 9 domain skills were installed with:</p>
+<pre><code>npx hyperframes skills update talking-head-recut</code></pre>
+<p><code>npx hyperframes doctor</code> reported the environment at minute zero:</p>
+<table>
+  <tr><th>Check</th><th>Result</th><th>Consequence</th></tr>
+  <tr><td>FFmpeg / FFprobe</td><td>✓ 7.1.1-essentials (winget)</td><td>probing, audio extraction, re-encode all work</td></tr>
+  <tr><td>Chrome headless</td><td>✓ chrome-headless-shell win64-149.0.7827.22</td><td>rendering works</td></tr>
+  <tr><td>whisper-cpp</td><td>✗ not installed</td><td><code>hyperframes transcribe</code> unusable — gap filled, see §4</td></tr>
+  <tr><td>Docker</td><td>✗ not running</td><td>irrelevant — local render only</td></tr>
+</table>
+<p>Reused instead of re-derived: the local <code>faster-whisper</code> install (already proven on this machine earlier in the session) and the word timings it produces.</p>
+
+<h2>3. Design decisions</h2>
+<p>The workflow normally asks four visual questions (aspect ratio, layout, style, card count). The session ran autonomously, so the skill's documented skip-path was used and the choices were disclosed after the fact:</p>
+<table>
+  <tr><th>Decision</th><th>Chosen</th><th>Rejected, and why</th></tr>
+  <tr><td>Aspect ratio</td><td>9:16 (1080×1920)</td><td>16:9 lost the moment a probe frame revealed the source is portrait (§6, problem 1). Matching the source needs no crop.</td></tr>
+  <tr><td>Layout</td><td><code>overlay</code> — full-bleed video, glass cards on top</td><td>The skip-default is <code>stack</code> (video top, card below). Overridden: stacking a portrait face-filling selfie would crop the face for no gain. The default exists for when nothing informs the choice; the probe frame informed it.</td></tr>
+  <tr><td>Style</td><td>Dark glass panels, Inter font, green/red semantics</td><td>Warm-paper and experimental style groups fit stories and stunts, not financial data.</td></tr>
+  <tr><td>Card count</td><td>5 (skill's hard floor)</td><td>The duration formula gives round(9.98s / 4.9s) = 2 cards; the skill floors at 5 so short clips keep rhythm.</td></tr>
+  <tr><td>Arrows</td><td>Inline SVG triangles</td><td>Unicode ▲▼ glyphs rejected: the bundled <code>Inter-*-latin.woff2</code> subsets likely lack them, and a missing glyph renders as tofu in headless Chrome.</td></tr>
+  <tr><td>Glass effect</td><td>Semi-opaque <code>rgba(7,11,17,0.78)</code></td><td><code>backdrop-filter: blur()</code> rejected: GPU-dependent in headless render, not worth the risk for a 10s clip.</td></tr>
+</table>
+<p>YAGNI cuts: no sub-composition split (lint suggested it; 5 cards in one file is inspectable), no outro sting, no captions (different workflow), no Docker/cloud render.</p>
+
+<h2>4. The sync problem — how words became timecodes</h2>
+<p>The heart of the job: a graphic must land at the instant its word is spoken. This is the section that demystifies the "magic".</p>
+
+<div class="flow">
+  <div class="step">stock_report.MOV<small>iPhone clip</small></div><div class="arrow">→</div>
+  <div class="step">ffmpeg<small>audio.mp3</small></div><div class="arrow">→</div>
+  <div class="step">faster-whisper small.en<small>word timestamps</small></div><div class="arrow">→</div>
+  <div class="step">transcript.json<small>[{text, start, end}]</small></div><div class="arrow">→</div>
+  <div class="step">storyboard.json<small>5 cards, timed</small></div><div class="arrow">→</div>
+  <div class="step">index.html<small>cards + GSAP timeline</small></div><div class="arrow">→</div>
+  <div class="step">hyperframes render<small>headless Chrome</small></div><div class="arrow">→</div>
+  <div class="step">output.mp4<small>300 frames @ 30fps</small></div>
+</div>
+
+<h3>4a. Word-level transcription</h3>
+<p>Whisper (model <code>small.en</code>, <code>word_timestamps=True</code>) returned each word with start/end seconds. The three load-bearing timings:</p>
+<pre><code>"30%"  spoken 2.72 – 4.52 s   → GOOGL count-up fires at 2.7333
+"20%"  spoken 5.64 – 7.30 s   → MSFT  count-up fires at 5.6333
+"5%"   spoken 8.18 – 9.46 s   → TSLA  count-up fires at 8.1667</code></pre>
+<p>All times are quantized to the frame grid (multiples of 1/30 s) so the animation lands on an exact rendered frame.</p>
+
+<h3>4b. The storyboard — 5 cards</h3>
+<table>
+  <tr><th>Card</th><th>Window (s)</th><th>Content</th></tr>
+  <tr><td>card-title</td><td>0.30 – 9.93</td><td>Top badge: "AUG 19 · MARKET UPDATE / STOCK REPORT", holds all video</td></tr>
+  <tr><td>card-google</td><td>0.90 – 4.47</td><td>Lower-third glass panel, GOOGL chip, ▲ +30% count-up (green)</td></tr>
+  <tr><td>card-msft</td><td>4.53 – 7.27</td><td>Same panel, MSFT, ▼ −20% count-up (red)</td></tr>
+  <tr><td>card-tesla</td><td>7.30 – 9.00</td><td>Same panel, TSLA, ▲ +5% count-up (green)</td></tr>
+  <tr><td>card-summary</td><td>9.00 – 9.93</td><td>Three tiles: GOOGL +30% / MSFT −20% / TSLA +5%, fast staggered pops</td></tr>
+</table>
+<p>One continuity rule from the user's own README — <span class="rule">"hold graphic as long as I talk about it"</span> — nearly broke at the tail: "5%." is spoken until 9.46s but the Tesla card exits at 9.0s. Fix: the summary strip that replaces it visibly carries TSLA +5%, so the information never leaves the screen while the word is still in the air.</p>
+
+<h3>4c. How HyperFrames turns HTML into video</h3>
+<p>This is the demystifying part. There is no video editor and no per-frame drawing code. The composition is one HTML file where:</p>
+<ul>
+  <li><strong>The DOM declares timing.</strong> Each card sits in a <code>&lt;div class="card-host clip" data-start="0.9000" data-duration="3.5667" data-track-index="3"&gt;</code>. The <code>clip</code> class makes the runtime show the element only inside its window — like a clip on an editor track, but written as attributes.</li>
+  <li><strong>The video is a layer, not a canvas.</strong> A muted <code>&lt;video&gt;</code> plays full-bleed on track 1. A separate <code>&lt;audio&gt;</code> element mounts the same file on track 10, so the rendered MP4 keeps the original voice while its volume stays independently controllable.</li>
+  <li><strong>All motion lives in one paused GSAP timeline</strong>, registered as <code>window.__timelines["talking-head-recut"]</code>. The renderer does not "play" the page. It seeks the timeline to frame 0, screenshots, seeks to frame 1, screenshots — 300 times — then ffmpeg encodes the frames plus the audio into MP4. Because every frame is a deterministic seek, the same input always renders the same video. This is also why <code>Math.random()</code> and <code>Date.now()</code> are banned in compositions.</li>
+  <li><strong>Count-ups are object tweens.</strong> GSAP tweens a plain <code>{v: 0}</code> to <code>{v: 30}</code> and an <code>onUpdate</code> writes <code>Math.round(o.v)</code> into the number's <code>&lt;span&gt;</code>. At any seeked frame the number shows the mathematically correct intermediate value — the verification in §7 exploits exactly this.</li>
+</ul>
+
+<h2>5. Tools and features used</h2>
+<table>
+  <tr><th>Tool</th><th>What it did this session</th></tr>
+  <tr><td><code>/hyperframes</code> + <code>/talking-head-recut</code> skills</td><td>Routing, workflow contract, card/composition rules, lint gates</td></tr>
+  <tr><td><code>npx hyperframes doctor / lint / snapshot / render</code></td><td>Env check; 0-error validation; 4 preview frames; final 300-frame render (60.5s wall clock, 6 workers)</td></tr>
+  <tr><td>ffprobe / ffmpeg</td><td>Metadata probe, audio extraction, keyframe-dense re-encode, proof-frame extraction, loudness check</td></tr>
+  <tr><td>faster-whisper (<code>small.en</code>, CUDA)</td><td>Word-level transcript that drives all card timing</td></tr>
+  <tr><td>GSAP (bundled <code>gsap.min.js</code>)</td><td>The single seekable timeline: enters, exits, bar grows, count-ups, tile pops</td></tr>
+  <tr><td>advisor (2 consultations)</td><td>1st: confirmed route + skip-path, flagged the Tesla-card continuity issue → summary-strip fix. 2nd: demanded the frozen-video and silent-audio checks that closed §7. Both changed the plan.</td></tr>
+  <tr><td>Subagents</td><td>None — all work inline.</td></tr>
+  <tr><td>Human-in-the-loop</td><td>None mid-run. The session ran autonomously end to end.</td></tr>
+</table>
+
+<h2>6. What went wrong, and the fixes</h2>
+<ol>
+  <li><strong>The video lied about its shape.</strong> ffprobe reported <code>1920×1080</code> — landscape. A single extracted frame showed a portrait image: iPhone MOVs store landscape pixels plus a 90° rotation flag. Every layout assumption flipped from 16:9 to 9:16. Fix: the staging re-encode bakes the rotation in (re-probe of the staged file: <code>1080,1920</code>). <span class="rule">Probe a real frame, not just the metadata — containers lie.</span></li>
+  <li><strong><code>hyperframes transcribe</code> was dead on arrival.</strong> Doctor: <code>✗ whisper-cpp — Not found (optional — needed for transcription)</code>. Fix: local faster-whisper produced <code>transcript.json</code> in the exact shape the skill expects (flat word array). No install, no functional loss.</li>
+  <li><strong>Seek-freeze trap (avoided by design).</strong> The skill warns that sources with sparse keyframes freeze on seek in the renderer — a frozen face under moving overlays. Fix applied preemptively: re-encode with <code>-g 30 -keyint_min 30</code> so every frame is seekable. §7 then verified the video actually moves.</li>
+  <li><strong>Snapshot runs overwrite each other.</strong> Four <code>hyperframes snapshot --at</code> calls left only the last run's PNG — each run cleans <code>public/snapshots/</code>. Nearly a wrong conclusion ("three snapshots failed"); a directory listing showed the real cause. Fix: snapshot one timestamp at a time and copy the frame out between runs.</li>
+  <li><strong>Lint warnings, triaged not obeyed.</strong> 0 errors, 7 warnings. <code>studio_missing_editable_id</code> ×5 — fixed by adding <code>id="host-card-*"</code> to every card host (cheap, aids future editing). <code>composition_file_too_large</code> and <code>timeline_track_too_dense</code> — deliberately skipped: splitting a 349-line, 5-card file into sub-compositions is structure for structure's sake.</li>
+  <li><strong>Unicode arrows would have been tofu.</strong> Not a failure — a near-miss caught at design time. The bundled fonts are latin subsets; ▲▼ were replaced with inline SVG polygons before the first render.</li>
+</ol>
+
+<h2>7. Verification — every claim observed, none assumed</h2>
+<div class="frames">
+  <figure><img src="videos/stock_report/cmp-prof-1.8.jpg" alt="1.8s"><figcaption>1.8s — title + GOOGL panel enter</figcaption></figure>
+  <figure><img src="videos/stock_report/cmp-prof-3.8.jpg" alt="3.8s"><figcaption>3.8s — count-up landed at +30%</figcaption></figure>
+  <figure><img src="videos/stock_report/cmp-prof-6.7.jpg" alt="6.7s"><figcaption>6.7s — from the final MP4: MSFT −20%</figcaption></figure>
+  <figure><img src="videos/stock_report/cmp-prof-3.1.jpg" alt="3.1s"><figcaption>3.1s — from the final MP4: +22% mid-count</figcaption></figure>
+</div>
+<p class="meta">Privacy note: the checks below ran on the original recording. The frames shown are the same timestamps from the face-swapped render (Part 2) — timings and overlays are identical, verified by frame diff in §14.6. Original-face frames are excluded from this repository.</p>
+<ul>
+  <li><strong>Layout:</strong> 4 pre-render snapshots read visually — no card covers eyes or mouth; portrait type sizes legible.</li>
+  <li><strong>The video plays under the overlays:</strong> frames pulled from <code>output.mp4</code> at 3.1s and 6.7s show different poses — not the frozen-seek failure.</li>
+  <li><strong>The animation renders, not snaps:</strong> the 3.1s frame reads <strong>+22%</strong> — a mathematically correct intermediate of a count-up that starts at 2.73s and eases to 30 over 1.0s. A frozen timeline would show 0 or 30.</li>
+  <li><strong>Audio carries speech:</strong> <code>ffmpeg -af volumedetect</code> → <code>mean_volume: -32.9 dB, max_volume: -7.6 dB</code>. A muxed-but-silent track reads ≈ −91 dB.</li>
+  <li><strong>Container facts:</strong> ffprobe on the output: 10.0s duration, audio stream present. Render log: 300/300 frames, artifact validated.</li>
+  <li><strong>Not verified:</strong> playback on an actual phone, and A/V sync drift below the ~33ms frame grid — no tooling for either here; both are low-risk at 10s.</li>
+</ul>
+
+<h2>8. Where things stand</h2>
+<ul>
+  <li><strong>Deliverable:</strong> <code>videos\stock_report\output.mp4</code> — done and verified.</li>
+  <li><strong>All intermediates kept</strong> in <code>videos\stock_report\</code>: <code>metadata.json</code>, <code>audio.mp3</code>, <code>transcript.json</code>, <code>storyboard.json</code>, <code>public/cards/*.html</code> (5 fragments), <code>public/index.html</code>, snapshots and proof frames. The composition is re-renderable and hand-editable: change a time or a color in <code>index.html</code>, run <code>npx hyperframes render public --skill=talking-head-recut -o output.mp4 --fps 30</code>.</li>
+  <li><strong>Costs:</strong> zero external API calls. Whisper and the render ran locally (render: 60.5s). No quotas touched.</li>
+  <li><strong>Open options, not promises:</strong> (a) the true-B-roll variant — cards take the full screen, face shrinks to a corner pip — a small timeline edit; (b) install whisper-cpp to un-gap the stock <code>hyperframes transcribe</code> path; (c) live preview via <code>npx hyperframes preview</code> in <code>videos/stock_report/public</code>.</li>
+</ul>
+
+<hr style="border:none;border-top:2px solid var(--border);margin:56px 0 40px">
+
+<h1>Part 2 — The professor: face swap and voice change</h1>
+<p class="meta">
+  <strong>Date:</strong> 2026-08-19, same day, evening session &nbsp;·&nbsp;
+  <strong>Deliverables:</strong> <code>videos\stock_report\output_professor.mp4</code> (new face) and <code>videos\stock_report\output_professor_voiced.mp4</code> (new face + new voice)<br>
+  <strong>Briefs (verbatim):</strong> "now is it possible to replace the talking head to another person ? can it be done ? do you need a reference image ?" → "face specification, a retired ivy league professor - white male. search for MIT professor images back in 1970s and 1980s for a reference. also research which models are best for face swap before execution." → "please implement the plan. do not overwrite existing videos." → "great. now change the voice too."<br>
+  <strong>Plan of record:</strong> <code>faceswap-plan.html</code> (written and approved before execution)
+</p>
+
+<div class="qa">
+  <h2>The direct questions, answered straight</h2>
+  <dl>
+    <dt>How was the face swap accomplished?</dt>
+    <dd>Not as a face swap. The persona needed tweed, tie, and gray hair — a body change — so the whole person was replaced. Pipeline: generate a fictional professor portrait → upload portrait + base clip to fal storage → run a character-replacement video model → verify → re-render the overlay cards on top in a copied composition.</dd>
+    <dt>Which models?</dt>
+    <dd>Face: <code>fal-ai/nano-banana</code> (text-to-image, one 3:4 portrait). Replacement: <code>fal-ai/wan/v2.2-14b/animate/replace</code> (Wan 2.2 Animate) at 720p. It transfers the source clip's motion, expressions, and lip movement onto the new person and preserves the audio track.</dd>
+    <dt>MCP or API?</dt>
+    <dd>Raw REST API. A Node script called fal's queue API (<code>POST https://queue.fal.run/&lt;model&gt;</code>, poll status, download). No MCP was involved in the face swap. Key: <code>FAL_API_KEY</code> from the project <code>.env</code>.</dd>
+    <dt>Face-swap cost?</dt>
+    <dd>≈ $1.54 estimated from list prices: $0.039 for the portrait + $1.50 for the replacement (299 frames ÷ 16 = 18.7 billable seconds × $0.08/s at 720p). fal exposes no balance endpoint, so this is not a billed figure — the exact charge is at fal.ai/dashboard/billing.</dd>
+    <dt>Voice change: provider and model?</dt>
+    <dd>ElevenLabs, model <code>eleven_multilingual_sts_v2</code> on a <code>voice-changer</code> node — speech-to-speech conversion, voice "Lawrence Mayles" (library voice, "elderly wise storyteller").</dd>
+    <dt>Voice change: MCP or API?</dt>
+    <dd>MCP. The raw API path failed first: the <code>ELEVENLABS_API_KEY</code> in <code>~/.env</code> (dated Sep 2025) returned <code>{"type":"authentication_error","code":"unauthorized","message":"Invalid API key"}</code>. Fallback: the claude.ai ElevenLabs connector (MCP over OAuth) — same service, no key on disk. This was the session's clearest MCP-vs-API lesson: <span class="rule">an MCP connector is a login that cannot rot in a dotfile.</span></dd>
+    <dt>Voice-change cost?</dt>
+    <dd>2.8¢, and this one IS measured: the MCP status response itself reported <code>166.74 credits = $0.0278</code>.</dd>
+  </dl>
+</div>
+
+<h2>9. The brief — and the consent line drawn first</h2>
+<p>The user asked to search 1970s–80s MIT professor photos "for a reference." Taken literally, that means feeding a real person's photo into a swap — putting a real, identifiable face on a body saying words that person never said. The interpretation chosen and stated before any work: archive photos inform the <em>text prompt only</em> (glasses shape, tweed, film grain); the face itself is AI-generated and fictional. No real person's likeness entered any model. <span class="rule">A face is an identity, not a style asset.</span></p>
+<p>The user also pre-authorized autonomy ("i am hoping that the entire process is autonomous") with a $10 fal credit as the hard ceiling. This set aside the genmedia skill's per-video quote-and-go gate — the one standing rule consciously overridden, named at the time.</p>
+
+<h2>10. Research before spend — four models, two discovery tricks</h2>
+<p>Consumer listicles ("best face swap apps 2026") were useless — they review subscription websites, not API endpoints. The real comparison came from fal's own machine-readable surfaces:</p>
+<table>
+  <tr><th>Candidate</th><th>What it does</th><th>Price for this 10s clip</th><th>Verdict</th></tr>
+  <tr><td><code>fal-ai/wan/v2.2-14b/animate/replace</code></td><td>Replaces the whole person; keeps scene lighting, motion, lip sync, audio</td><td>$1.50 @ 720p ($0.75 @ 480p)</td><td><strong>Chosen</strong> — the persona is mostly clothes and hair</td></tr>
+  <tr><td><code>fal-ai/pixverse/swap</code> (mode "person")</td><td>Whole-person swap, keeps audio, max 720p</td><td>≈ $0.40 @ 720p</td><td>Named fallback, not needed</td></tr>
+  <tr><td><code>fal-ai/face-swap/video-to-video</code></td><td>Face only — hair, clothes, body stay from source</td><td>unpublished (cents)</td><td>Set aside: professor face on the original clothing mismatches</td></tr>
+  <tr><td><code>easel-ai/advanced-face-swap</code></td><td>Face swap, images only</td><td>—</td><td>Rejected: no video input</td></tr>
+</table>
+<p>The two tricks that made this checkable without a browser (both now cached in the genmedia skill for future sessions):</p>
+<ul>
+  <li><code>https://fal.ai/api/openapi/queue/openapi.json?endpoint_id=&lt;model-id&gt;</code> — full input/output schema for any fal model. This is how "easel is image-only" and "Wan needs <code>video_url</code> + <code>image_url</code>" were established as facts, not guesses.</li>
+  <li><code>https://fal.ai/models/&lt;model-id&gt;/llms.txt</code> — the model page, including pricing, served without the Vercel bot block that 403s the normal page. (404s on some nested ids — it failed for <code>face-swap/video-to-video</code>, which is why that price stayed unknown.)</li>
+</ul>
+
+<h2>11. The autonomous pipeline — what "autonomous" actually meant</h2>
+<div class="flow">
+  <div class="step">FACE_PROMPT<small>text only, no photo refs</small></div><div class="arrow">→</div>
+  <div class="step">nano-banana<small>3:4 portrait, $0.04</small></div><div class="arrow">→</div>
+  <div class="step">fal storage<small>upload image, then video</small></div><div class="arrow">→</div>
+  <div class="step">Wan 2.2 replace<small>720p, ~25 min, $1.50</small></div><div class="arrow">→</div>
+  <div class="step">ffprobe gates<small>duration, audio, frame</small></div><div class="arrow">→</div>
+  <div class="step">public_professor/<small>copied composition</small></div><div class="arrow">→</div>
+  <div class="step">hyperframes render<small>40.3s, 300 frames</small></div><div class="arrow">→</div>
+  <div class="step">output_professor.mp4</div>
+</div>
+<p>One Node script (<code>faceswap.js</code>, session scratchpad; recipe preserved in the genmedia <code>models.md</code>) ran all API stages with three autonomy mechanics worth naming:</p>
+<ul>
+  <li><strong>Fail-cheap ordering.</strong> The $0.04 image generation ran first — it doubles as a key-and-billing test before anything expensive. The image upload ran before the video upload — it validated the recalled storage endpoint on a 419&nbsp;KB file before trusting it with the clip. The $1.50 call went last.</li>
+  <li><strong>State-cached stages.</strong> Each stage wrote its result to a <code>state.json</code>; a rerun skips completed stages. A crash after the Wan call would not re-charge $1.50.</li>
+  <li><strong>Unattended waiting.</strong> The Wan job took ~25 minutes. The script ran as a background task; scheduled wake-ups checked progress at ~20-minute intervals with a 60-minute hang deadline and the Pixverse fallback pre-decided. No human watched a progress bar.</li>
+</ul>
+<p>An advisor consultation before execution changed the plan in four places: swap the already-normalized <code>public/input-video.mp4</code> instead of the raw MOV (the rotation-lie gotcha from Part 1, §6.1, would have baked in sideways); pass <code>resolution: "720p"</code> explicitly because <strong>Wan's schema defaults to 480p</strong> — the silent-downgrade trap; test the upload endpoint on the image first; and render in a copied <code>public_professor/</code> folder to honor "do not overwrite existing videos" for the composition too, not just the output file.</p>
+
+<h2>12. The voice — why speech-to-speech and not text-to-speech</h2>
+<p>The naive path — transcribe, then TTS the text in a new voice — produces new audio with new word timings. The professor's Wan-transferred lips follow the <em>original</em> timings; TTS audio would drift against them within a second. The correct tool is <strong>speech-to-speech voice conversion</strong> (STS): it re-voices the existing waveform, keeping every word onset, pause, and intonation contour. Timbre changes; the timeline does not; lip sync survives untouched.</p>
+<p>Execution: the original track was extracted fresh (<code>ffmpeg → generations/professor_voice_source.mp3</code>; Part 1's <code>audio.mp3</code> looked missing, but that was a wrong-working-directory check — the re-extract was 3 seconds and harmless), uploaded through the MCP asset flow (create upload → HTTP PUT → finalize), wired into a <code>voice-changer</code> node on ElevenLabs flow <code>2WtuooeX558i7rddC6w6</code>, and converted with <code>eleven_multilingual_sts_v2</code>. The result (9.98s, matching to the centisecond) was remuxed with <code>-c:v copy</code> — the video stream untouched, bit for bit — into <code>output_professor_voiced.mp4</code>. The flow stays editable on the ElevenLabs canvas: other voices can be auditioned there without re-running anything locally.</p>
+<p>Voice selection was done by description ("elderly wise storyteller"), not by ear — an agent cannot listen. That limit was stated to the user rather than papered over.</p>
+
+<h2>13. Tools and features used (Part 2)</h2>
+<table>
+  <tr><th>Tool</th><th>What it did this session</th></tr>
+  <tr><td>genmedia skill</td><td>Provider routing, budget rules, output/sidecar conventions; its <code>models.md</code> gained three verified recipes</td></tr>
+  <tr><td>WebSearch + WebFetch</td><td>Model discovery; schema and pricing verification via the OpenAPI and llms.txt tricks</td></tr>
+  <tr><td>Node 'fetch' (no deps)</td><td>The whole fal pipeline: queue submit, poll, storage upload, download — raw REST, no SDK</td></tr>
+  <tr><td>fal.ai queue API</td><td><code>fal-ai/nano-banana</code> and <code>fal-ai/wan/v2.2-14b/animate/replace</code></td></tr>
+  <tr><td>ElevenLabs MCP connector</td><td>Voice list, asset upload, voice-changer node, run status with measured cost — after the raw API key proved dead</td></tr>
+  <tr><td>ffmpeg / ffprobe</td><td>Stream probes, loudness checks, frame extraction, audio extraction, final remux (<code>-c:v copy</code>)</td></tr>
+  <tr><td>HyperFrames</td><td>One re-render of the Part 1 composition over the swapped clip (<code>public_professor/</code>, 40.3s)</td></tr>
+  <tr><td>advisor (2 consultations)</td><td>1st: the four pre-execution corrections in §11. 2nd: caught three finish-line gaps — stale plan status, half-done skill documentation, and "measured" overstating an estimated cost. Both changed the work.</td></tr>
+  <tr><td>Background tasks + scheduled wake-ups</td><td>Unattended 25-minute generation and the render, with a hang deadline and fallback pre-decided</td></tr>
+  <tr><td>Human-in-the-loop</td><td>Twice, both for keys/credit: "my fal.ai has $10 credit" and adding <code>FAL_API_KEY</code> to <code>.env</code>. Zero mid-pipeline decisions.</td></tr>
+</table>
+
+<h2>14. What went wrong, and the fixes</h2>
+<ol>
+  <li><strong>No fal key anywhere.</strong> Environment, project <code>.env</code> (absent), <code>~/.env</code> — all empty of <code>FAL_API_KEY</code>. Blocked at step 0; the user added the key to the project <code>.env</code>. Per the skill's rule, the key was named but never requested in chat, and no key value was ever echoed.</li>
+  <li><strong>fal docs 404 and bot-block.</strong> <code>docs.fal.ai</code> redirected then 404'd; model pages 403 bots. Fix: the OpenAPI and llms.txt side-doors (§10). The storage upload endpoint could not be verified from docs at all — it was a recalled guess, so it was tested empirically on the cheap image before the video depended on it.</li>
+  <li><strong>The render died on a one-line shell mistake.</strong> <code>cd: videos/stock_report: No such file or directory</code> — the session shell was already <em>inside</em> that directory (cwd persists between calls). Fix: absolute path. Cost: one harmless background-task failure.</li>
+  <li><strong>The ElevenLabs API key was dead.</strong> Verbatim: <code>{"detail":{"type":"authentication_error","code":"unauthorized","message":"Invalid API key"}}</code>. The key sat in <code>~/.env</code> since Sep 2025. Fix: switch transport to the MCP connector. <span class="rule">Keys rot silently; test the cheapest read call before building on one.</span></li>
+  <li><strong>Part 1's <code>audio.mp3</code> "was gone" — except it wasn't.</strong> A <code>stat</code> failed with <code>No such file or directory</code> and the session concluded the file had been deleted. The real cause, discovered only later during the repo build: the shell's working directory was already <em>inside</em> <code>videos/stock_report</code>, so the relative path resolved to a folder that doesn't exist. The 3-second fix (re-extract from <code>input-video.mp4</code>) was harmless, but the diagnosis was wrong for hours. Same root cause as §14.3 — cwd persistence bit this session twice. <span class="rule">When a file you expect is "missing", print the cwd before believing the disk.</span></li>
+  <li><strong>False alarm: "the B-roll motion graphics are gone."</strong> The user reported missing graphics in the professor render. Frame-by-frame comparison at 1.8 / 3.8 / 5.3 / 6.7 / 9.5s (<code>cmp-orig-*.jpg</code> vs <code>cmp-prof-*.jpg</code>; the professor set is in this repo, the original-face set is excluded for privacy) proved both renders identical at every timestamp. The real cause: a "true B-roll" variant (full-screen cards, face in a pip) <em>never existed</em> — Part 1, §1 records it as the deliberately-not-built option. What looked like a regression was a memory of a feature that was never made. The frame diff, not a re-render, was the fix.</li>
+  <li><strong>The 480p trap that didn't fire.</strong> Wan's <code>resolution</code> defaults to 480p while the plan and quote said 720p. Caught in review before the call, not after a wasted $0.75 generation. A silent default would have produced a worse video that still "worked" — the most expensive kind of bug.</li>
+</ol>
+
+<h2>15. Verification — every claim observed</h2>
+<div class="frames">
+  <figure><img src="videos/stock_report/cmp-prof-3.8.jpg" alt="professor at 3.8s"><figcaption>3.8s — professor + GOOGL +30%</figcaption></figure>
+  <figure><img src="videos/stock_report/cmp-prof-5.3.jpg" alt="professor at 5.3s"><figcaption>5.3s — MSFT panel enters</figcaption></figure>
+  <figure><img src="videos/stock_report/cmp-prof-9.5.jpg" alt="professor at 9.5s"><figcaption>9.5s — summary strip intact</figcaption></figure>
+</div>
+<ul>
+  <li><strong>Swap integrity:</strong> output duration 9.984s vs source 9.977s (frame-level match); a real decoded frame at 5s shows the professor mid-speech, not the "no face found → source returned" silent failure mode.</li>
+  <li><strong>Audio survived the swap:</strong> <code>volumedetect max_volume: -7.6 dB</code> — the pre-planned remux fallback was not needed.</li>
+  <li><strong>Overlays identical to Part 1:</strong> the five-timestamp frame diff of §14.6.</li>
+  <li><strong>Voice output:</strong> converted clip 9.98s (timing preserved ⇒ lip sync preserved by construction); final remux 9.984s, <code>max_volume: -10.4 dB</code>; video stream copied, not re-encoded.</li>
+  <li><strong>Not verified:</strong> how the new voice actually <em>sounds</em> (no ears here — the ElevenLabs flow link lets the user audition), the exact fal invoice (no balance API), and phone playback.</li>
+</ul>
+
+<h2>16. Unknown unknowns — what this session teaches that nobody asks</h2>
+<ul>
+  <li><strong>"Face swap" is two different products.</strong> Face-only swap (cheap, keeps your body/clothes, native resolution) vs full character replacement (10–50× the price, replaces everything, capped resolution). The persona decides which you need — this one was 90% wardrobe, so the face-only model was the wrong tool despite the name of the request.</li>
+  <li><strong>Video AI bills in model-seconds, not clip-seconds.</strong> Wan charges frames ÷ 16. The same 10-second clip costs twice as much at 60fps as at 30fps. Frame rate is a billing decision.</li>
+  <li><strong>Every replacement model tops out at 720p (today).</strong> The escape used here: only the <em>base footage</em> suffers the cap. The overlay cards are HTML rendered at canvas resolution — sharp 1080×1920 type over 720p video. Layered composition beats one-pass generation whenever text is involved.</li>
+  <li><strong>Defaults are traps priced in silence.</strong> A model that defaults to its cheapest tier (480p) will happily deliver a worse product with no error. Read the schema; pass the parameter.</li>
+  <li><strong>The reference image has a grammar.</strong> Wan wants a waist-up character reference, not a face crop — it replaces a person, so it must see a person. A headshot would have produced garbage from a correct pipeline.</li>
+  <li><strong>Result URLs are perishable.</strong> fal URLs die in ~24h; ElevenLabs signed URLs in 2h. Download immediately or lose the thing you paid for.</li>
+  <li><strong>STS vs TTS is the lip-sync fork.</strong> Any workflow that regenerates speech from text breaks sync with existing video. Voice <em>conversion</em> keeps the waveform's timing. (Third option, not needed here: keep any audio and re-animate the lips with a lipsync model like <code>sync-lipsync-v3</code> — that trades audio fidelity problems for video fidelity problems.)</li>
+  <li><strong>Silent audio is a stream, too.</strong> A video can "have an audio track" that is muxed silence (≈ −91 dB). Presence checks lie; loudness checks (<code>volumedetect</code>) don't.</li>
+  <li><strong>Three transports to the same AI service, failing differently.</strong> Raw REST + key in dotfile (rots silently — both of this machine's stored keys were unusable tonight in different ways), MCP connector + OAuth (survives key rot, no secret on disk), and local CLI. A resilient setup knows its fallback order before the failure.</li>
+  <li><strong>Docs are increasingly bot-blocked; schemas are not.</strong> The marketing page 403s an agent, but the OpenAPI JSON and llms.txt endpoints — built <em>for</em> machines — carry the same facts. Agent-legible surfaces are becoming the real documentation.</li>
+  <li><strong>Identity is the ethical rail.</strong> The one interpretation refused in this session: putting a real professor's archive face onto a body speaking invented words. Fictional faces make the same video with none of the harm. Decide this before generating, not after.</li>
+  <li><strong>Autonomy is engineering, not trust.</strong> What made unattended execution safe was structure: cheapest-call-first ordering, state caching so a crash can't double-bill, a hard budget ceiling, a hang deadline with a pre-decided fallback, and observed-effect gates (frames, durations, loudness) between every stage. Remove those and "autonomous" just means "unwatched."</li>
+</ul>
+
+<h2>17. Costs, and where things stand</h2>
+<table>
+  <tr><th>Item</th><th>Provider · transport</th><th>Cost</th><th>Basis</th></tr>
+  <tr><td>Professor portrait</td><td>fal · REST API</td><td>$0.039</td><td>list price</td></tr>
+  <tr><td>Character replacement</td><td>fal · REST API</td><td>$1.495</td><td>computed from published rate; not billed-verified</td></tr>
+  <tr><td>Voice conversion</td><td>ElevenLabs · MCP connector</td><td>$0.028</td><td><strong>measured</strong> (166.74 credits, reported by the API)</td></tr>
+  <tr><td>Renders, probes, remux</td><td>local</td><td>$0</td><td>—</td></tr>
+  <tr><td><strong>Total</strong></td><td></td><td><strong>≈ $1.56</strong></td><td>of the $10 ceiling</td></tr>
+</table>
+<ul>
+  <li><strong>Deliverables:</strong> <code>output_professor.mp4</code> (new face, original voice) and <code>output_professor_voiced.mp4</code> (new face, new voice) in <code>videos\stock_report\</code>. Originals untouched, per the brief.</li>
+  <li><strong>Knowledge captured:</strong> genmedia <code>models.md</code> + <code>SKILL.md</code> (three verified recipes, two discovery tricks, the 480p trap), <code>HANDOFF.md</code> (resume state), <code>faceswap-plan.html</code> (the approved plan, status flipped to executed), sidecar JSONs beside every generated asset in <code>generations\</code>.</li>
+  <li><strong>Open options, not promises:</strong> (a) audition other voices on the ElevenLabs flow — free until conversion; (b) a paid upscale pass if the 720p base bothers on a big screen; (c) the true-B-roll variant from Part 1, still unbuilt, still one timeline edit away.</li>
+</ul>
+
+<p class="meta" style="margin-top:40px">Part 1 written 2026-08-19 from the live session transcript. Part 2 appended the same evening, also from the live transcript — nothing reconstructed. This HTML lives at the project root; images are referenced relative to it — keep the <code>videos/stock_report/</code> folder beside it.</p>
+
+</main>
+</body>
+</html>

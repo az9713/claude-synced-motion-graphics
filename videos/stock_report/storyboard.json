@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 3,
+  "composition": {
+    "fps": 30,
+    "width": 1080,
+    "height": 1920,
+    "durationSeconds": 9.983,
+    "layout": "portrait",
+    "themeId": "slate",
+    "seed": 42
+  },
+  "videoTrack": {
+    "sourcePath": "input-video.mp4",
+    "startSec": 0,
+    "endSec": 9.983,
+    "bounds": { "x": 0, "y": 0, "width": 1080, "height": 1920 }
+  },
+  "subtitles": { "enabled": false },
+  "cards": [
+    {
+      "id": "card-title",
+      "intent": "Persistent top badge naming the piece: daily stock report, Aug 19",
+      "startSec": 0.3,
+      "endSec": 9.9333,
+      "accentIndex": 0,
+      "zone": "video-overlay",
+      "contentHints": { "kicker": "AUG 19 · MARKET UPDATE", "title": "STOCK REPORT" }
+    },
+    {
+      "id": "card-google",
+      "intent": "Data callout while speaker says Google up 30% - count-up lands when '30%' is spoken (2.73s)",
+      "startSec": 0.9,
+      "endSec": 4.4667,
+      "accentIndex": 2,
+      "zone": "lower-third",
+      "contentHints": { "ticker": "GOOGL", "name": "Alphabet Inc.", "move": "+30%", "countAt": 2.7333 }
+    },
+    {
+      "id": "card-msft",
+      "intent": "Data callout while speaker says Microsoft down 20% - count-up at 5.63s",
+      "startSec": 4.5333,
+      "endSec": 7.2667,
+      "accentIndex": 1,
+      "zone": "lower-third",
+      "contentHints": { "ticker": "MSFT", "name": "Microsoft Corp.", "move": "-20%", "countAt": 5.6333 }
+    },
+    {
+      "id": "card-tesla",
+      "intent": "Data callout while speaker says Tesla up 5% - count-up at 8.17s",
+      "startSec": 7.3,
+      "endSec": 9.0,
+      "accentIndex": 2,
+      "zone": "lower-third",
+      "contentHints": { "ticker": "TSLA", "name": "Tesla Inc.", "move": "+5%", "countAt": 8.1667 }
+    },
+    {
+      "id": "card-summary",
+      "intent": "Closing strip: all three moves as tiles; carries TSLA +5% while the word is still being spoken",
+      "startSec": 9.0,
+      "endSec": 9.9333,
+      "accentIndex": 0,
+      "zone": "lower-third",
+      "contentHints": { "tiles": ["GOOGL +30%", "MSFT -20%", "TSLA +5%"] }
+    }
+  ]
+}

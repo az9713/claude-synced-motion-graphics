@@ -1,0 +1,11 @@
+{
+  "prompt": "waist-up portrait of a retired professor, white male in his early 70s, gray receding hair, trimmed gray beard, horn-rimmed glasses, brown tweed jacket with elbow patches, knit wool tie, warm office light, bookshelves behind, 1980s Kodachrome film look",
+  "model": "fal-ai/nano-banana",
+  "provider": "fal",
+  "refs": [],
+  "params": {
+    "aspect_ratio": "3:4"
+  },
+  "cost_usd": 0.039,
+  "created": "2026-08-20T02:51:07.011Z"
+}

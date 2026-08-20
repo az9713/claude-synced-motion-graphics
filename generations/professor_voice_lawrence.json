@@ -1,0 +1,11 @@
+{
+  "prompt": "Speech-to-speech conversion of stock_report narration to elderly professor voice (Lawrence Mayles), timing preserved for lip sync",
+  "model": "eleven_multilingual_sts_v2 (voice-changer)",
+  "provider": "elevenlabs (claude.ai connector)",
+  "voice_id": "liXYZRafib6dsV7EExjZ",
+  "voice_name": "Lawrence Mayles",
+  "refs": ["professor_voice_source.mp3"],
+  "params": { "flow_id": "2WtuooeX558i7rddC6w6" },
+  "cost_usd": 0.028,
+  "created": "2026-08-19T20:45:00-07:00"
+}

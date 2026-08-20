@@ -1,0 +1,51 @@
+<div class="card" data-card-id="card-summary">
+          <style>
+            .card[data-card-id="card-summary"] .root {
+              width: 100%;
+              height: 100%;
+              background: transparent;
+              display: flex;
+              align-items: center;
+              gap: 20px;
+            }
+            .card[data-card-id="card-summary"] .tile {
+              flex: 1;
+              background: var(--panel);
+              border: 1px solid var(--panel-border);
+              border-radius: 20px;
+              padding: 40px 0;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 18px;
+            }
+            .card[data-card-id="card-summary"] .t-ticker {
+              font: 700 30px/1 "Inter", sans-serif;
+              letter-spacing: 3px;
+              color: #e2e8f0;
+            }
+            .card[data-card-id="card-summary"] .t-move {
+              font: 700 54px/1 "Inter", sans-serif;
+            }
+            .card[data-card-id="card-summary"] .up {
+              color: var(--up);
+            }
+            .card[data-card-id="card-summary"] .down {
+              color: var(--down);
+            }
+          </style>
+          <div class="root">
+            <div class="tile" id="card-summary-t1">
+              <div class="t-ticker">GOOGL</div>
+              <div class="t-move up">+30%</div>
+            </div>
+            <div class="tile" id="card-summary-t2">
+              <div class="t-ticker">MSFT</div>
+              <div class="t-move down">&minus;20%</div>
+            </div>
+            <div class="tile" id="card-summary-t3">
+              <div class="t-ticker">TSLA</div>
+              <div class="t-move up">+5%</div>
+            </div>
+          </div>
+        </div>

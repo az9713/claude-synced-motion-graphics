@@ -1,0 +1,72 @@
+<div class="card" data-card-id="card-msft">
+          <style>
+            .card[data-card-id="card-msft"] .root {
+              width: 100%;
+              height: 100%;
+              background: transparent;
+            }
+            .card[data-card-id="card-msft"] .panel {
+              position: absolute;
+              inset: 0;
+              background: var(--panel);
+              border: 1px solid var(--panel-border);
+              border-radius: 24px;
+              padding: 0 52px 0 60px;
+              display: flex;
+              align-items: center;
+              overflow: hidden;
+            }
+            .card[data-card-id="card-msft"] .bar {
+              position: absolute;
+              left: 0;
+              top: 0;
+              width: 10px;
+              height: 0;
+              background: var(--down);
+            }
+            .card[data-card-id="card-msft"] .who {
+              display: flex;
+              flex-direction: column;
+              gap: 16px;
+            }
+            .card[data-card-id="card-msft"] .ticker {
+              font: 700 40px/1 "Inter", sans-serif;
+              letter-spacing: 3px;
+              color: #1a0b0b;
+              background: var(--down);
+              border-radius: 12px;
+              padding: 12px 22px;
+              align-self: flex-start;
+            }
+            .card[data-card-id="card-msft"] .name {
+              font: 400 30px/1 "Inter", sans-serif;
+              color: var(--muted);
+            }
+            .card[data-card-id="card-msft"] .move {
+              margin-left: auto;
+              display: flex;
+              align-items: center;
+              gap: 20px;
+              color: var(--down);
+            }
+            .card[data-card-id="card-msft"] .num,
+            .card[data-card-id="card-msft"] .sign,
+            .card[data-card-id="card-msft"] .pct {
+              font: 700 128px/1 "Inter", sans-serif;
+              letter-spacing: -2px;
+            }
+          </style>
+          <div class="root">
+            <div class="panel">
+              <div class="bar" id="card-msft-bar"></div>
+              <div class="who" id="card-msft-who">
+                <div class="ticker">MSFT</div>
+                <div class="name">Microsoft Corp.</div>
+              </div>
+              <div class="move" id="card-msft-move">
+                <svg width="56" height="56" viewBox="0 0 24 24"><polygon points="12,21 22,4 2,4" fill="currentColor" /></svg>
+                <span class="sign">&minus;</span><span class="num" id="card-msft-num">0</span><span class="pct">%</span>
+              </div>
+            </div>
+          </div>
+        </div>

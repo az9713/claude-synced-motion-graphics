@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      @font-face {
+        font-family: "Inter";
+        src: url("fonts/Inter-400-latin.woff2") format("woff2");
+        font-weight: 400;
+        font-display: block;
+      }
+      @font-face {
+        font-family: "Inter";
+        src: url("fonts/Inter-700-latin.woff2") format("woff2");
+        font-weight: 700;
+        font-display: block;
+      }
+
+      :root {
+        --bg: #0f172a;
+        --text: #f1f5f9;
+        --muted: #94a3b8;
+        --up: #4ade80;
+        --down: #f87171;
+        --panel: rgba(7, 11, 17, 0.78);
+        --panel-border: rgba(255, 255, 255, 0.14);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #000;
+        font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+      }
+      #stage {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      .video-wrapper {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+      }
+      .video-wrapper video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .card-host {
+        position: absolute;
+        pointer-events: none;
+        overflow: hidden;
+      }
+      .card-host .card {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="stage"
+      data-composition-id="talking-head-recut"
+      data-start="0"
+      data-duration="9.983"
+      data-fps="30"
+      data-width="1080"
+      data-height="1920"
+    >
+      <div class="video-wrapper" id="video-wrap">
+        <video
+          id="bg-video"
+          src="input-video.mp4"
+          muted
+          playsinline
+          data-start="0"
+          data-duration="9.983"
+          data-track-index="1"
+        ></video>
+      </div>
+      <audio
+        id="source-audio"
+        src="input-video.mp4"
+        data-start="0"
+        data-duration="9.983"
+        data-track-index="10"
+        data-volume="1"
+      ></audio>
+
+      <!-- card-title: persistent top badge -->
+      <div
+        class="card-host clip"
+        id="host-card-title"
+        data-card-id="card-title"
+        data-start="0.3000"
+        data-duration="9.6333"
+        data-track-index="2"
+        style="left:0;top:0;width:1080px;height:1920px;visibility:hidden;opacity:0;"
+      >
+        <div class="card" data-card-id="card-title">
+          <style>
+            .card[data-card-id="card-title"] .root {
+              width: 100%;
+              height: 100%;
+              background: transparent;
+            }
+            .card[data-card-id="card-title"] .badge {
+              position: absolute;
+              top: 72px;
+              left: 50%;
+              transform: translateX(-50%);
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 12px;
+            }
+            .card[data-card-id="card-title"] .kicker {
+              font: 700 22px/1 "Inter", sans-serif;
+              letter-spacing: 5px;
+              color: #e2e8f0;
+              text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+            }
+            .card[data-card-id="card-title"] .title {
+              font: 700 60px/1 "Inter", sans-serif;
+              letter-spacing: 8px;
+              color: #ffffff;
+              background: var(--panel);
+              border: 1px solid var(--panel-border);
+              border-radius: 16px;
+              padding: 22px 46px 22px 54px;
+              white-space: nowrap;
+            }
+          </style>
+          <div class="root">
+            <div class="badge" id="card-title-badge">
+              <div class="kicker">AUG 19 &middot; MARKET UPDATE</div>
+              <div class="title">STOCK REPORT</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- card-google: lower-third data callout -->
+      <div
+        class="card-host clip"
+        id="host-card-google"
+        data-card-id="card-google"
+        data-start="0.9000"
+        data-duration="3.5667"
+        data-track-index="3"
+        style="left:40px;top:1440px;width:1000px;height:360px;visibility:hidden;opacity:0;"
+      >
+        <div class="card" data-card-id="card-google">
+          <style>
+            .card[data-card-id="card-google"] .root {
+              width: 100%;
+              height: 100%;
+              background: transparent;
+            }
+            .card[data-card-id="card-google"] .panel {
+              position: absolute;
+              inset: 0;
+              background: var(--panel);
+              border: 1px solid var(--panel-border);
+              border-radius: 24px;
+              padding: 0 52px 0 60px;
+              display: flex;
+              align-items: center;
+              overflow: hidden;
+            }
+            .card[data-card-id="card-google"] .bar {
+              position: absolute;
+              left: 0;
+              top: 0;
+              width: 10px;
+              height: 0;
+              background: var(--up);
+            }
+            .card[data-card-id="card-google"] .who {
+              display: flex;
+              flex-direction: column;
+              gap: 16px;
+            }
+            .card[data-card-id="card-google"] .ticker {
+              font: 700 40px/1 "Inter", sans-serif;
+              letter-spacing: 3px;
+              color: #0b1220;
+              background: var(--up);
+              border-radius: 12px;
+              padding: 12px 22px;
+              align-self: flex-start;
+            }
+            .card[data-card-id="card-google"] .name {
+              font: 400 30px/1 "Inter", sans-serif;
+              color: var(--muted);
+            }
+            .card[data-card-id="card-google"] .move {
+              margin-left: auto;
+              display: flex;
+              align-items: center;
+              gap: 20px;
+              color: var(--up);
+            }
+            .card[data-card-id="card-google"] .num,
+            .card[data-card-id="card-google"] .sign,
+            .card[data-card-id="card-google"] .pct {
+              font: 700 128px/1 "Inter", sans-serif;
+              letter-spacing: -2px;
+            }
+          </style>
+          <div class="root">
+            <div class="panel">
+              <div class="bar" id="card-google-bar"></div>
+              <div class="who" id="card-google-who">
+                <div class="ticker">GOOGL</div>
+                <div class="name">Alphabet Inc.</div>
+              </div>
+              <div class="move" id="card-google-move">
+                <svg width="56" height="56" viewBox="0 0 24 24"><polygon points="12,3 22,20 2,20" fill="currentColor" /></svg>
+                <span class="sign">+</span><span class="num" id="card-google-num">0</span><span class="pct">%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- card-msft: lower-third data callout -->
+      <div
+        class="card-host clip"
+        id="host-card-msft"
+        data-card-id="card-msft"
+        data-start="4.5333"
+        data-duration="2.7334"
+        data-track-index="3"
+        style="left:40px;top:1440px;width:1000px;height:360px;visibility:hidden;opacity:0;"
+      >
+        <div class="card" data-card-id="card-msft">
+          <style>
+            .card[data-card-id="card-msft"] .root {
+              width: 100%;
+              height: 100%;
+              background: transparent;
+            }
+            .card[data-card-id="card-msft"] .panel {
+              position: absolute;
+              inset: 0;
+              background: var(--panel);
+              border: 1px solid var(--panel-border);
+              border-radius: 24px;
+              padding: 0 52px 0 60px;
+              display: flex;
+              align-items: center;
+              overflow: hidden;
+            }
+            .card[data-card-id="card-msft"] .bar {
+              position: absolute;
+              left: 0;
+              top: 0;
+              width: 10px;
+              height: 0;
+              background: var(--down);
+            }
+            .card[data-card-id="card-msft"] .who {
+              display: flex;
+              flex-direction: column;
+              gap: 16px;
+            }
+            .card[data-card-id="card-msft"] .ticker {
+              font: 700 40px/1 "Inter", sans-serif;
+              letter-spacing: 3px;
+              color: #1a0b0b;
+              background: var(--down);
+              border-radius: 12px;
+              padding: 12px 22px;
+              align-self: flex-start;
+            }
+            .card[data-card-id="card-msft"] .name {
+              font: 400 30px/1 "Inter", sans-serif;
+              color: var(--muted);
+            }
+            .card[data-card-id="card-msft"] .move {
+              margin-left: auto;
+              display: flex;
+              align-items: center;
+              gap: 20px;
+              color: var(--down);
+            }
+            .card[data-card-id="card-msft"] .num,
+            .card[data-card-id="card-msft"] .sign,
+            .card[data-card-id="card-msft"] .pct {
+              font: 700 128px/1 "Inter", sans-serif;
+              letter-spacing: -2px;
+            }
+          </style>
+          <div class="root">
+            <div class="panel">
+              <div class="bar" id="card-msft-bar"></div>
+              <div class="who" id="card-msft-who">
+                <div class="ticker">MSFT</div>
+                <div class="name">Microsoft Corp.</div>
+              </div>
+              <div class="move" id="card-msft-move">
+                <svg width="56" height="56" viewBox="0 0 24 24"><polygon points="12,21 22,4 2,4" fill="currentColor" /></svg>
+                <span class="sign">&minus;</span><span class="num" id="card-msft-num">0</span><span class="pct">%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- card-tesla: lower-third data callout -->
+      <div
+        class="card-host clip"
+        id="host-card-tesla"
+        data-card-id="card-tesla"
+        data-start="7.3000"
+        data-duration="1.7000"
+        data-track-index="3"
+        style="left:40px;top:1440px;width:1000px;height:360px;visibility:hidden;opacity:0;"
+      >
+        <div class="card" data-card-id="card-tesla">
+          <style>
+            .card[data-card-id="card-tesla"] .root {
+              width: 100%;
+              height: 100%;
+              background: transparent;
+            }
+            .card[data-card-id="card-tesla"] .panel {
+              position: absolute;
+              inset: 0;
+              background: var(--panel);
+              border: 1px solid var(--panel-border);
+              border-radius: 24px;
+              padding: 0 52px 0 60px;
+              display: flex;
+              align-items: center;
+              overflow: hidden;
+            }
+            .card[data-card-id="card-tesla"] .bar {
+              position: absolute;
+              left: 0;
+              top: 0;
+              width: 10px;
+              height: 0;
+              background: var(--up);
+            }
+            .card[data-card-id="card-tesla"] .who {
+              display: flex;
+              flex-direction: column;
+              gap: 16px;
+            }
+            .card[data-card-id="card-tesla"] .ticker {
+              font: 700 40px/1 "Inter", sans-serif;
+              letter-spacing: 3px;
+              color: #0b1220;
+              background: var(--up);
+              border-radius: 12px;
+              padding: 12px 22px;
+              align-self: flex-start;
+            }
+            .card[data-card-id="card-tesla"] .name {
+              font: 400 30px/1 "Inter", sans-serif;
+              color: var(--muted);
+            }
+            .card[data-card-id="card-tesla"] .move {
+              margin-left: auto;
+              display: flex;
+              align-items: center;
+              gap: 20px;
+              color: var(--up);
+            }
+            .card[data-card-id="card-tesla"] .num,
+            .card[data-card-id="card-tesla"] .sign,
+            .card[data-card-id="card-tesla"] .pct {
+              font: 700 128px/1 "Inter", sans-serif;
+              letter-spacing: -2px;
+            }
+          </style>
+          <div class="root">
+            <div class="panel">
+              <div class="bar" id="card-tesla-bar"></div>
+              <div class="who" id="card-tesla-who">
+                <div class="ticker">TSLA</div>
+                <div class="name">Tesla Inc.</div>
+              </div>
+              <div class="move" id="card-tesla-move">
+                <svg width="56" height="56" viewBox="0 0 24 24"><polygon points="12,3 22,20 2,20" fill="currentColor" /></svg>
+                <span class="sign">+</span><span class="num" id="card-tesla-num">0</span><span class="pct">%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- card-summary: closing three-tile strip -->
+      <div
+        class="card-host clip"
+        id="host-card-summary"
+        data-card-id="card-summary"
+        data-start="9.0000"
+        data-duration="0.9333"
+        data-track-index="3"
+        style="left:40px;top:1440px;width:1000px;height:360px;visibility:hidden;opacity:0;"
+      >
+        <div class="card" data-card-id="card-summary">
+          <style>
+            .card[data-card-id="card-summary"] .root {
+              width: 100%;
+              height: 100%;
+              background: transparent;
+              display: flex;
+              align-items: center;
+              gap: 20px;
+            }
+            .card[data-card-id="card-summary"] .tile {
+              flex: 1;
+              background: var(--panel);
+              border: 1px solid var(--panel-border);
+              border-radius: 20px;
+              padding: 40px 0;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 18px;
+            }
+            .card[data-card-id="card-summary"] .t-ticker {
+              font: 700 30px/1 "Inter", sans-serif;
+              letter-spacing: 3px;
+              color: #e2e8f0;
+            }
+            .card[data-card-id="card-summary"] .t-move {
+              font: 700 54px/1 "Inter", sans-serif;
+            }
+            .card[data-card-id="card-summary"] .up {
+              color: var(--up);
+            }
+            .card[data-card-id="card-summary"] .down {
+              color: var(--down);
+            }
+          </style>
+          <div class="root">
+            <div class="tile" id="card-summary-t1">
+              <div class="t-ticker">GOOGL</div>
+              <div class="t-move up">+30%</div>
+            </div>
+            <div class="tile" id="card-summary-t2">
+              <div class="t-ticker">MSFT</div>
+              <div class="t-move down">&minus;20%</div>
+            </div>
+            <div class="tile" id="card-summary-t3">
+              <div class="t-ticker">TSLA</div>
+              <div class="t-move up">+5%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script src="vendor/gsap.min.js"></script>
+      <script>
+        (function () {
+          const tl = window.gsap.timeline({ paused: true });
+
+          // ── card-title [0.3 → 9.9333] ──
+          tl.set('.card-host[data-card-id="card-title"]', { visibility: "visible" }, 0.3);
+          tl.fromTo(
+            '.card-host[data-card-id="card-title"]',
+            { opacity: 0 },
+            { opacity: 1, duration: 0.4, ease: "power2.out" },
+            0.3,
+          );
+          tl.from(
+            '.card[data-card-id="card-title"] #card-title-badge',
+            { y: -60, duration: 0.5, ease: "power2.out" },
+            0.3,
+          );
+
+          // ── card-google [0.9 → 4.4667], count-up when "30%" is spoken (2.7333) ──
+          tl.set('.card-host[data-card-id="card-google"]', { visibility: "visible" }, 0.9);
+          tl.fromTo(
+            '.card-host[data-card-id="card-google"]',
+            { opacity: 0, y: 70 },
+            { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" },
+            0.9,
+          );
+          tl.fromTo(
+            '.card[data-card-id="card-google"] #card-google-bar',
+            { height: 0 },
+            { height: 360, duration: 0.5, ease: "power2.out" },
+            1.0,
+          );
+          tl.from(
+            '.card[data-card-id="card-google"] #card-google-who',
+            { opacity: 0, x: -40, duration: 0.4, ease: "power2.out" },
+            1.0667,
+          );
+          tl.fromTo(
+            '.card[data-card-id="card-google"] #card-google-move',
+            { opacity: 0, scale: 0.7 },
+            { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.6)" },
+            2.7333,
+          );
+          (function () {
+            const o = { v: 0 };
+            tl.to(
+              o,
+              {
+                v: 30,
+                duration: 1.0,
+                ease: "power2.out",
+                onUpdate: function () {
+                  const el = document.querySelector('.card[data-card-id="card-google"] #card-google-num');
+                  if (el) el.textContent = String(Math.round(o.v));
+                },
+              },
+              2.7333,
+            );
+          })();
+          tl.to(
+            '.card-host[data-card-id="card-google"]',
+            { opacity: 0, duration: 0.3, ease: "power2.in" },
+            4.1667,
+          );
+          tl.set('.card-host[data-card-id="card-google"]', { visibility: "hidden" }, 4.4667);
+
+          // ── card-msft [4.5333 → 7.2667], count-up at 5.6333 ──
+          tl.set('.card-host[data-card-id="card-msft"]', { visibility: "visible" }, 4.5333);
+          tl.fromTo(
+            '.card-host[data-card-id="card-msft"]',
+            { opacity: 0, y: 70 },
+            { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" },
+            4.5333,
+          );
+          tl.fromTo(
+            '.card[data-card-id="card-msft"] #card-msft-bar',
+            { height: 0 },
+            { height: 360, duration: 0.5, ease: "power2.out" },
+            4.6333,
+          );
+          tl.from(
+            '.card[data-card-id="card-msft"] #card-msft-who',
+            { opacity: 0, x: -40, duration: 0.4, ease: "power2.out" },
+            4.7,
+          );
+          tl.fromTo(
+            '.card[data-card-id="card-msft"] #card-msft-move',
+            { opacity: 0, scale: 0.7 },
+            { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.6)" },
+            5.6333,
+          );
+          (function () {
+            const o = { v: 0 };
+            tl.to(
+              o,
+              {
+                v: 20,
+                duration: 1.0,
+                ease: "power2.out",
+                onUpdate: function () {
+                  const el = document.querySelector('.card[data-card-id="card-msft"] #card-msft-num');
+                  if (el) el.textContent = String(Math.round(o.v));
+                },
+              },
+              5.6333,
+            );
+          })();
+          tl.to(
+            '.card-host[data-card-id="card-msft"]',
+            { opacity: 0, duration: 0.3, ease: "power2.in" },
+            6.9667,
+          );
+          tl.set('.card-host[data-card-id="card-msft"]', { visibility: "hidden" }, 7.2667);
+
+          // ── card-tesla [7.3 → 9.0], count-up at 8.1667 ──
+          tl.set('.card-host[data-card-id="card-tesla"]', { visibility: "visible" }, 7.3);
+          tl.fromTo(
+            '.card-host[data-card-id="card-tesla"]',
+            { opacity: 0, y: 70 },
+            { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" },
+            7.3,
+          );
+          tl.fromTo(
+            '.card[data-card-id="card-tesla"] #card-tesla-bar',
+            { height: 0 },
+            { height: 360, duration: 0.5, ease: "power2.out" },
+            7.4,
+          );
+          tl.from(
+            '.card[data-card-id="card-tesla"] #card-tesla-who',
+            { opacity: 0, x: -40, duration: 0.4, ease: "power2.out" },
+            7.4667,
+          );
+          tl.fromTo(
+            '.card[data-card-id="card-tesla"] #card-tesla-move',
+            { opacity: 0, scale: 0.7 },
+            { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(1.6)" },
+            8.1667,
+          );
+          (function () {
+            const o = { v: 0 };
+            tl.to(
+              o,
+              {
+                v: 5,
+                duration: 0.6,
+                ease: "power2.out",
+                onUpdate: function () {
+                  const el = document.querySelector('.card[data-card-id="card-tesla"] #card-tesla-num');
+                  if (el) el.textContent = String(Math.round(o.v));
+                },
+              },
+              8.1667,
+            );
+          })();
+          tl.to(
+            '.card-host[data-card-id="card-tesla"]',
+            { opacity: 0, duration: 0.25, ease: "power2.in" },
+            8.75,
+          );
+          tl.set('.card-host[data-card-id="card-tesla"]', { visibility: "hidden" }, 9.0);
+
+          // ── card-summary [9.0 → 9.9333], fast staggered tile pops ──
+          tl.set('.card-host[data-card-id="card-summary"]', { visibility: "visible" }, 9.0);
+          tl.fromTo(
+            '.card-host[data-card-id="card-summary"]',
+            { opacity: 0 },
+            { opacity: 1, duration: 0.2, ease: "power2.out" },
+            9.0,
+          );
+          tl.from(
+            '.card[data-card-id="card-summary"] .tile',
+            { opacity: 0, scale: 0.6, duration: 0.3, ease: "back.out(1.6)", stagger: 0.08 },
+            9.0,
+          );
+
+          window.__timelines = window.__timelines || {};
+          window.__timelines["talking-head-recut"] = tl;
+        })();
+      </script>
+    </div>
+  </body>
+</html>

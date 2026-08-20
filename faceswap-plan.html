@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<title>Face Swap Plan — stock_report</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0f172a;
+    color: #cbd5e1;
+    font-family: "Segoe UI", system-ui, sans-serif;
+    line-height: 1.6;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+  h1 { color: #e2e8f0; font-size: 1.7rem; margin-bottom: .3rem; }
+  h2 { color: #fb923c; font-size: 1.15rem; margin: 2.2rem 0 .8rem; }
+  h3 { color: #e2e8f0; font-size: 1rem; margin: 1.2rem 0 .4rem; }
+  p { margin: .6rem 0; }
+  .meta { color: #94a3b8; font-size: .85rem; margin-bottom: 1.5rem; }
+  .card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 1.1rem 1.3rem;
+    margin: 1rem 0;
+  }
+  .pick { border-color: #2dd4bf; }
+  .pick .tag { background: #2dd4bf; color: #0f172a; }
+  .tag {
+    display: inline-block;
+    background: #334155;
+    color: #e2e8f0;
+    font-size: .72rem;
+    font-weight: 600;
+    padding: .15rem .55rem;
+    border-radius: 99px;
+    margin-left: .5rem;
+    vertical-align: middle;
+  }
+  code, .mono {
+    font-family: Consolas, monospace;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 4px;
+    padding: .08rem .35rem;
+    font-size: .88em;
+    color: #2dd4bf;
+  }
+  .card code { background: #0f172a; }
+  table { width: 100%; border-collapse: collapse; margin: .8rem 0; font-size: .92rem; }
+  th, td { text-align: left; padding: .45rem .6rem; border-bottom: 1px solid #334155; }
+  th { color: #94a3b8; font-weight: 600; font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; }
+  td.num { color: #fb923c; white-space: nowrap; }
+  ol { margin: .6rem 0 .6rem 1.4rem; }
+  ol li { margin: .45rem 0; }
+  ul { margin: .6rem 0 .6rem 1.4rem; }
+  ul li { margin: .3rem 0; }
+  a { color: #2dd4bf; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .prompt {
+    background: #0f172a;
+    border: 1px dashed #334155;
+    border-radius: 8px;
+    padding: .9rem 1.1rem;
+    font-style: italic;
+    color: #e2e8f0;
+    margin: .8rem 0;
+  }
+  .note { color: #94a3b8; font-size: .88rem; }
+  .warn { color: #fb923c; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<h1>Face Swap Plan — stock_report</h1>
+<p class="meta">2026-08-19 · project <code>claude_design_part_N_zinho</code> · status: <span class="warn">executed 2026-08-19</span> — result: <code>videos/stock_report/output_professor.mp4</code></p>
+
+<h2>Goal</h2>
+<p>Replace the talking head in <code>stock_report.MOV</code> (10-second selfie clip, 1080×1920, 30 fps) with a fictional retired Ivy League professor: white male, early 70s, 1970s–80s MIT style. The process runs autonomously end to end. The reference face is AI-generated. Budget ceiling: <strong>$10 fal.ai credit</strong>. Expected spend: <strong>≈ $1.55</strong> (worst case with one retry ≈ $3.10).</p>
+
+<h2>Models researched (schemas verified against the live fal.ai API)</h2>
+
+<div class="card pick">
+  <h3>fal-ai/wan/v2.2-14b/animate/replace <span class="tag">RECOMMENDED</span></h3>
+  <p>Wan 2.2 Animate, replace mode. Replaces the whole character. Preserves the scene's lighting, motion, and facial expressions — lip sync carries over. Required inputs: <code>video_url</code> + <code>image_url</code> (character reference).</p>
+  <table>
+    <tr><th>Resolution</th><th>Price / billable s</th><th>This clip (300 frames ÷ 16 = 18.75 s)</th></tr>
+    <tr><td>720p</td><td class="num">$0.08</td><td class="num">$1.50 ← plan</td></tr>
+    <tr><td>580p</td><td class="num">$0.06</td><td class="num">$1.13</td></tr>
+    <tr><td>480p</td><td class="num">$0.04</td><td class="num">$0.75</td></tr>
+  </table>
+  <p class="note">Why this one: the professor persona needs tweed jacket, wool tie, and gray hair — a body-and-clothes change, not a face-only change.</p>
+</div>
+
+<div class="card">
+  <h3>fal-ai/pixverse/swap <span class="tag">FALLBACK</span></h3>
+  <p>Mode <code>person</code> replaces the whole person. Keeps original audio (<code>original_sound_switch</code> default true). Max 720p. Price for the 10-second clip: <strong>$0.40 at 720p</strong> ($0.20 per 5 s, doubled over 5 s). Use if Wan quality disappoints.</p>
+</div>
+
+<div class="card">
+  <h3>fal-ai/face-swap/video-to-video <span class="tag">SET ASIDE</span></h3>
+  <p>Swaps the face only. Hair, clothes, and body stay from the source. Keeps native resolution. Price unpublished (older utility model, typically cents — first run measures it). Rejected: a professor face on the original clothing mismatches the persona.</p>
+</div>
+
+<div class="card">
+  <h3>easel-ai/advanced-face-swap <span class="tag">REJECTED</span></h3>
+  <p>Image input only — no video support. Out.</p>
+</div>
+
+<h2>Accepted trade-off</h2>
+<p>All person-replacement models cap output at 720p. The swapped clip drops from 1080×1920 to 720p-class. The five overlay cards re-render on top at full sharpness — they are HTML layers in <code>videos/stock_report/public/</code>, not video pixels.</p>
+
+<h2>Reference face — fictional, consent-safe</h2>
+<p>1970s–80s MIT archive material (Getty ~2,171 MIT professor photos; MIT Museum; MIT Libraries) informs the <strong>text prompt only</strong>. No real professor's photo enters the swap. The face is generated with Nano Banana on fal (<code>fal-ai/nano-banana</code>, ≈ $0.04), waist-up — Wan wants a character reference, not a face crop.</p>
+<div class="prompt">"waist-up portrait of a retired professor, white male in his early 70s, gray receding hair, trimmed gray beard, horn-rimmed glasses, brown tweed jacket with elbow patches, knit wool tie, warm office light, bookshelves behind, 1980s Kodachrome film look"</div>
+
+<h2>Execution pipeline (autonomous on "go")</h2>
+<ol>
+  <li>Generate the professor image with <code>fal-ai/nano-banana</code>. Save to <code>generations/refs/</code> with a prompt sidecar JSON.</li>
+  <li>Upload the image and <code>stock_report.MOV</code> to fal storage. The model needs URLs, not local paths.</li>
+  <li>Call <code>fal-ai/wan/v2.2-14b/animate/replace</code> at 720p. Poll until complete. Download the result immediately to <code>generations/</code>.</li>
+  <li>Verify: file exists and has size; probe frames to see the professor; check the audio track.</li>
+  <li>If audio was dropped, remux it from the original with ffmpeg (stream copy, no re-encode).</li>
+  <li>Point the HyperFrames project at the swapped clip, then re-render:<br>
+      <code>cd videos/stock_report && npx hyperframes render public --skill=talking-head-recut -o output.mp4 --fps 30</code></li>
+  <li>Report: files created, measured spend vs the $10 ceiling.</li>
+</ol>
+<p class="note">Autonomy note: the genmedia per-video "quote and go" gate is set aside by the user's explicit instruction. The $10 credit is the hard ceiling; spend is tracked across every call.</p>
+
+<h2>Sources</h2>
+<ul>
+  <li><a href="https://fal.ai/models/fal-ai/wan/v2.2-14b/animate/replace">Wan-2.2 Animate Replace on fal</a></li>
+  <li><a href="https://fal.ai/models/fal-ai/pixverse/swap">PixVerse Swap on fal</a></li>
+  <li><a href="https://fal.ai/docs/documentation/model-apis/pricing">fal pricing docs</a></li>
+  <li><a href="https://www.gettyimages.com/photos/mit-professor">Getty — MIT professor photos</a></li>
+  <li><a href="https://collections.mitmuseum.org/major-collection/photography/">MIT Museum photography archives</a></li>
+  <li><a href="https://libguides.mit.edu/findingimages">MIT Libraries image resources</a></li>
+</ul>
+
+</body>
+</html>

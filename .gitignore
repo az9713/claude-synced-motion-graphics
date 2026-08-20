@@ -1,0 +1,21 @@
+# Original talking head (face and/or voice) — never commit
+.ignore/
+stock_report.MOV
+videos/stock_report/output.mp4
+videos/stock_report/output_professor.mp4
+videos/stock_report/public/input-video.mp4
+videos/stock_report/public_professor/input-video.mp4
+videos/stock_report/public/snapshots/
+videos/stock_report/public_professor/snapshots/
+videos/stock_report/snap-*.png
+videos/stock_report/proof-*.jpg
+videos/stock_report/frame5.jpg
+videos/stock_report/cmp-orig-*.jpg
+videos/stock_report/check-*.jpg
+generations/professor_voice_source.mp3
+generations/professor-swap_wan-animate_*.mp4
+
+# local secrets
+.env
+videos/stock_report/audio.mp3
+.claude/
